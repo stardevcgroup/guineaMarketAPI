@@ -1,7 +1,13 @@
 module.exports = {
   apps : [{
     script: 'bin/www',
-    watch: '.'
+    watch: '.',
+    env: {
+      NODE_ENV: "development",
+    },
+    env_production : {
+      NODE_ENV : "production"
+  }
   }, {
     script: './service-worker/',
     watch: ['./service-worker']
@@ -17,6 +23,7 @@ module.exports = {
       'pre-deploy-local': '',
       'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
+      "ssh_options": "StrictHostKeyChecking=no"
     }
   }
 };
