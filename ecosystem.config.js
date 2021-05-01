@@ -17,11 +17,10 @@ module.exports = {
       host : ['152.228.217.119'],
       ref  : 'origin/main',
       repo : 'git@github.com:stardevcgroup/guineaMarketAPI.git',
-      path : '/var/www/',
+      path : '/home',
       'pre-deploy-local': '',
       'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
-      "ssh_options": "StrictHostKeyChecking=no"
     }
   }
 };
