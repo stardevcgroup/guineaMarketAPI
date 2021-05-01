@@ -96,7 +96,29 @@ router.post( '/login', passport.authenticate('local') , ( req, res ) => {
 } );
 
 
-router.put('/:id', cors.corsWithOptions, ( req, res, next ) => {
+
+router.put("/reset-password/:id", function(req, res) {
+  var userid = req.params.id;
+  var username = req.body.username;
+  var newPass = req.body.password;
+  console.log(username, userid)
+  User.findByUsername(username).then(function(sanitizedUser) {
+      if (sanitizedUser) {
+          sanitizedUser.setPassword(newPass, function() {
+              sanitizedUser.save();
+              res.send('réinitialisation du mot de passe réussie');
+          });
+      } else {
+          res.send('L\'utilisateur n\'existe pas');
+      }
+  }, function(err) {
+      console.error(err);
+  })
+})
+
+
+
+router.put('/update/:id', cors.corsWithOptions, ( req, res, next ) => {
   User.findOneAndUpdate( {_id: req.params.id} , {
     $set: req.body
   }, { new: true })

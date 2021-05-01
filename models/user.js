@@ -33,7 +33,14 @@ var userSchema = new Schema( {
         default: true
     },
     gender: {
-      type: String
+      type: String,
+      require: true,
+      default: 'M'
+    },
+    profession: {
+        type: String,
+        require: true,
+        default: 'N/A'
     },
     facebookId: String,
 } );

@@ -25,6 +25,7 @@ const produitShema = new Schema( {
     },
     disponible: {
         type: Boolean,
+        require: true,
         default: true,
     },
     user: {
@@ -40,9 +41,16 @@ const produitShema = new Schema( {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Ville'
     },
+    categorie: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Categorie'
+    },
+    natutre: {
+        type: String,
+        require: true,
+        default: 'Occasion'
+    },
     reseau: [],
-
-
 }, {
     timestamps: true
 } );
