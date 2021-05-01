@@ -17,7 +17,7 @@ module.exports = {
       ref  : 'origin/main',
       repo : 'git@github.com:stardevcgroup/guineaMarketAPI.git',
       path : '/var/www',
-      'pre-deploy-local': '/var/www',
+      'pre-deploy-local': 'C:\\Users\\damaro\\img\\guineaMarketAPI',
       'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
     }
