@@ -12,7 +12,7 @@ router.use( bodyParser.json() )
 
 /* GET users listing. */
 
-router.get( '/', authenticate.verifyAdmin, cors.corsWithOptions, (req, res, next) => {
+router.get( '/',  (req, res, next) => {
   User.find( {} )
   .then( ( utilisateur ) =>{
       res.json( utilisateur )
@@ -20,6 +20,7 @@ router.get( '/', authenticate.verifyAdmin, cors.corsWithOptions, (req, res, next
   },  (err) => { res.json( { statusText: err.message, statusCode: err.status } ) })
   .catch((err) => next( err ) );//{ res.json( { statusText: err.message, statusCode: err.status } ) });
 });
+
 router.get( '/facebook/token', passport.authenticate('facebook-token'), ( req, res ) => {
   if( req.user ) {
     var token = authenticate.getToken( { _id: req.user._id, username: req.user.username, admin: req.user.admin } )
@@ -74,17 +75,37 @@ router.post('/signup',  cors.corsWithOptions, upload.single( 'avatar'), (req, re
   });
 });
 
-router.post( '/login',  cors.corsWithOptions, passport.authenticate('local') , ( req, res ) => {
-  var token = authenticate.getToken( { _id: req.user._id, username: req.user.username, admin: req.user.admin } )
-  res.statusCode = 200;
+router.post( '/login', passport.authenticate('local') , ( req, res ) => {
   res.setHeader( 'Content-Type', 'application/json' );
-  res.json( { 
-              success: true, 
-              token: token,
-              message: 'Vous êtes connectés avec succès !', 
-              status: res.statusCode 
-            } );
+  if ( req.body.password === undefined || req.body.password == null) {
+    let err = new Error( 'username et le mot de passe sont réquis' );
+    err.status = 403;
+    res.statusCode = 403;
+    res.statusCode = 200;
+    res.json({ statusCode: res.statusCode, statusText: err.message })
+  } else {
+    var token = authenticate.getToken( { _id: req.user._id, username: req.user.username, admin: req.user.admin } )
+    res.statusCode = 200;
+    res.json( { 
+      success: true, 
+      token: token,
+      message: 'Vous êtes connectés avec succès !', 
+      status: res.statusCode 
+    } );
+  }
 } );
+
+
+router.put('/:id', cors.corsWithOptions, ( req, res, next ) => {
+  User.findOneAndUpdate( {_id: req.params.id} , {
+    $set: req.body
+  }, { new: true })
+  .then( ( user ) => {
+    res.json( user );
+  }, ( err ) => next( err ) )
+   .catch( ( err ) => next( err ) );     
+} )
+
 
 router.get( '/logout',  cors.corsWithOptions, ( req, res, next ) => {
   if( req.session ) {

@@ -27,6 +27,11 @@ var userSchema = new Schema( {
         type: Boolean,
         default: false
     },
+    active: {
+        type: Boolean,
+        require: true,
+        default: true
+    },
     gender: {
       type: String
     },

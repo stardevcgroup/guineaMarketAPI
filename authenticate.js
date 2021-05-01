@@ -43,9 +43,7 @@ exports.verifyUser = passport.authenticate( 'jwt', { session: false } );
 exports.verifyAdmin = ( req, res, next ) => {
     var user = jwt_decode(req.headers.authorization);
     var admin = user.admin ;
-    
 	if ( admin ) {
-        console.log( '===========' + admin);
 		next();
 	} else {
 		var err = new Error('Vous n\'êtes pas autorisé à effectuer cette opération, devez être admin!!');
@@ -56,25 +54,14 @@ exports.verifyAdmin = ( req, res, next ) => {
 };
 
 exports.productOwner = ( req, res, next ) => {
-    Produit.findById( { _id: req.user._id } )
-            .then( produit => {
-                if ( produit !== null )  {
-                    if (req.user._id == produit.utilisteur._id ) {
-                        next();
-                    } else {
-                        var err = new Error('Ce produit ne vous appartient pas !!!');
-                        err.status = 403;
-                        res.statusCode = 403;
-                        return next(err);
-                    }
-                } else {
-                    var err = new Error('Ce produit n\'existe pas !!!');
-                    err.status = 403;
-                    res.statusCode = 403;
-                    return next(err);
-                }
-            } )
-    
+    if ( req.user._id != null ) {
+        next()
+    }  else {
+        err = new Error( 'Veuillez vous connectez d\'abord' );
+        err.status = 403;
+        res.status = 403;
+        res.json({ statusCode: res.statusCode, statusText: err.message } );
+    }
 }
 
 /*exports.facebookPassport = passport.use(new FacebookTokenStrategy({

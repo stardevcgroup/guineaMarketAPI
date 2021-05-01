@@ -8,7 +8,7 @@ var storage = mutlter.diskStorage( {
       var username = jwt_decode(req.headers.authorization);
       username = JSON.stringify( username.username );
       username = ( username.indexOf('@') > 0 ) ? username.substr(1, (username.indexOf('@') -1 ) ): username;
-      //console.log( username )
+      console.log( "++++" +username )
       let dir = 'public/images/' + username;
       if (!fs.existsSync(dir)){
         fs.mkdirSync(dir);

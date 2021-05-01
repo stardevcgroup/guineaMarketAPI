@@ -40,12 +40,7 @@ const produitShema = new Schema( {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Ville'
     },
-    reseau: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Reseau'
-        }
-    ],
+    reseau: [],
 
 
 }, {

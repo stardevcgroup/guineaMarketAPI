@@ -7,8 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('guineamarketapi:server');
 var http = require('http');
-var https = require( 'https' );
-var fs = require( 'fs' );
+/*var https = require( 'https' );
+var fs = require( 'fs' );*/
 
 /**
  * Get port from environment and store in Express.

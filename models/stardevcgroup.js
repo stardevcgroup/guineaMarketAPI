@@ -25,10 +25,6 @@ var stardevcgroupSshema = new Schema( {
         type: String,
         require: true
     },
-    apropos: {
-        type: String,
-        require: true
-    },
     emails: [],
     phones: [],
 } );
