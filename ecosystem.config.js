@@ -20,7 +20,7 @@ module.exports = {
       'pre-deploy-local': '',
       'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
-      "ssh_options": "StrictHostKeyChecking=yes"
+      "ssh_options": "StrictHostKeyChecking=no"
     }
   }
 };
