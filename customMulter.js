@@ -5,9 +5,8 @@ var jwt_decode = require( 'jwt-decode' );
 var storage = mutlter.diskStorage( {
   
   destination: ( req, file, cb ) => {
-      var username = jwt_decode(req.headers.authorization);
-      username = JSON.stringify( username.username );
-      username = ( username.indexOf('@') > 0 ) ? username.substr(1, (username.indexOf('@') -1 ) ): username;
+      var username =  req.body.username ;
+      username = ( username.indexOf('@') > 0 ) ? username.substr(0,  (username.indexOf('@') ) ): username;
       console.log( "++++" +username )
       let dir = 'public/images/' + username;
       if (!fs.existsSync(dir)){

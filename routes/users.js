@@ -48,17 +48,27 @@ router.get( '/facebook/token', passport.authenticate('facebook-token'), ( req, r
 
 router.post('/signup',  cors.corsWithOptions, upload.single( 'avatar'), (req, res, next) => {
    
-  User.register(new User({
-      username: req.body.username, 
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
-      emails: req.body.emails,
-      phones: req.body.phones,
-      cin: req.body.cin,
-      avatar: req.file? req.file.path.substr( "public".length ): "/images/users/avatar.png",
-      admin: true
-    }), 
+  User.register(new User({username: req.body.username}), 
     req.body.password, (err, user) => {
+    if(err) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.json({err: err});
+    }
+    else {
+      if (req.body.firstname)
+        user.firstname = req.body.firstname;
+      if (req.body.lastname)
+        user.lastname = req.body.lastname;
+      if (req.body.email)
+        user.email = req.body.email;
+      if (req.body.phone)
+        user.phone = req.body.phone;
+      if (req.body.cin)
+        user.cin = req.body.cin;
+      if( user.avatar ) {
+        user.avatar = req.file.path.substr( "public".length );
+      }
       user.save((err, user) => {
         if (err) {
           res.statusCode = 500;
@@ -72,6 +82,7 @@ router.post('/signup',  cors.corsWithOptions, upload.single( 'avatar'), (req, re
           res.json({success: true, status: 'Inscription réussi!'});
         });
       });
+    }
   });
 });
 
