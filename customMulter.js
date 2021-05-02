@@ -3,12 +3,17 @@ var fs = require( 'fs' );
 var jwt_decode = require( 'jwt-decode' );
 
 var storage = mutlter.diskStorage( {
-  
+
   destination: ( req, file, cb ) => {
-      var username =  req.body.username ;
-      username = ( username.indexOf('@') > 0 ) ? username.substr(0,  (username.indexOf('@') ) ): username;
-      console.log( "++++" +username )
-      let dir = 'public/images/' + username;
+      var username = jwt_decode(req.headers.authorization);
+      console.log( username )
+      username = JSON.stringify( username.username );
+      username = username.replace(' ', '');
+      username = username.replace('"', '');
+      username = username.replace('"', '');
+      username = username.toLowerCase();
+      username = ( username.indexOf('@') > 0 ) ? username.substr(1, (username.indexOf('@') -1 ) ): username;
+      let dir = 'public/images/produits/' + username;
       if (!fs.existsSync(dir)){
         fs.mkdirSync(dir);
       }
@@ -19,12 +24,14 @@ var storage = mutlter.diskStorage( {
   }
 } );
 
-const imageFilter = ( req, file, cb ) => {
-  if( !file.originalname.match( /\.(jpg|jpeg|png|gif)$/) ) {
-      return cb( 'Vous ne pouvez télécharger que des fichiers: jpg, jpeg, png et gif', null );
-  } 
+/*const imageFilter = ( req, files, cb ) => {
+  files.forEach( file => {
+      if( !file.originalname.match( /\.(jpg|jpeg|png|gif)$/) ) {
+        return cb( 'Vous ne pouvez télécharger que des fichiers: jpg, jpeg, png et gif', null );
+    }
+  });
   cb( null, true)
-};
+};*/
 
-var upload = mutlter({ storage: storage, fileFilter: imageFilter });
+var upload = mutlter({ storage: storage });
 module.exports = upload;

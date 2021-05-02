@@ -3,14 +3,14 @@ var bodyParser = require( 'body-parser' );
 const Produit = require('./../models/produit');
 var authenticate = require( './../authenticate' );
 var mongoose = require('mongoose');
-var upload = require( './../customMulter' );
 const cors  = require('./cors');
 
+var upload = require( './../customMulter' )
 
-var upload = upload;
+
+
 var produitRouter = express.Router();
 produitRouter.use( bodyParser.json() );
-
 
 
 
@@ -32,6 +32,7 @@ produitRouter.route( '/' )
         .catch((err) => next(err));
     })
     .post( cors.corsWithOptions, authenticate.verifyUser, upload.array('images', 12), ( req, res, next ) =>{
+        console.log( "*****", req.body )
         req.body.images = [];
         if( req.body.ville != undefined )
             req.body.ville = mongoose.Types.ObjectId( req.body.ville.trim() );

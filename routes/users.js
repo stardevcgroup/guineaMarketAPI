@@ -4,10 +4,36 @@ var bodyParser = require( 'body-parser' );
 var User = require( './../models/user' );
 var passport = require( 'passport' );
 var authenticate = require( './../authenticate' );
-var upload = require( './../customMulter' );
 var cors = require( './cors' );
 
-var upload = upload;
+var mutlter = require( 'multer' );
+var fs = require( 'fs' );
+
+
+var storage = mutlter.diskStorage( {
+
+  destination: ( req, file, cb ) => {
+      var username = req.body.username;;
+      username = ( username.indexOf('@') > 0 ) ? username.substr(0, (username.indexOf('@') ) ): username;
+      let dir = 'public/images/users/' + username;
+      if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+      }
+      cb( null, dir );
+  },
+  filename: ( req, file, cb ) => {
+      cb( null, file.originalname );
+  }
+} );
+
+const imageFilter = ( req, file, cb ) => {
+  if( !file.originalname.match( /\.(jpg|jpeg|png|gif)$/) ) {
+      return cb( 'Vous ne pouvez télécharger que des fichiers: jpg, jpeg, png et gif', null );
+  }
+  cb( null, true)
+};
+var upload = mutlter({ storage: storage, fileFilter: imageFilter });
+
 router.use( bodyParser.json() )
 
 /* GET users listing. */
@@ -87,6 +113,7 @@ router.post('/signup',  cors.corsWithOptions, upload.single( 'avatar'), (req, re
 });
 
 router.post( '/login', passport.authenticate('local') , ( req, res ) => {
+  console.log( req.body )
   res.setHeader( 'Content-Type', 'application/json' );
   if ( req.body.password === undefined || req.body.password == null) {
     let err = new Error( 'username et le mot de passe sont réquis' );
