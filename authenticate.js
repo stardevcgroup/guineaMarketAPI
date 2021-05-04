@@ -24,7 +24,6 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken(  );
 opts.secretOrKey = config.secretKey;
 
 exports.jwtPasssport = passport.use( new JwtStrategy( opts, ( jwt_payload, done ) => { 
-                                console.log( 'JWT payload: ' + jwt_payload );
                                 User.findOne( { _id: jwt_payload._id }, ( err, user ) => {
                                     if( err ) {
                                         err.status = 403;

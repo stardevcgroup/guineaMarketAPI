@@ -27,7 +27,6 @@ villeRouter.route( '/' )
         if ( req.body.nom != undefined ) {
             Ville.create( req.body )
                 .then(( ville ) => {
-                    console.log( 'ville crée ', ville );
                     res.json( ville );
                 }, (err) => next( err ) )
                 .catch( ( err ) => next( err ) );  

@@ -34,7 +34,6 @@ stardevcgroupRouter.route( '/' )
         if( req.body.designation != undefined ) {
             Stardevcgroup.create( req.body )
                 .then(( stardevcgroup ) => {
-                    console.log( 'stardevcgroup crée ', stardevcgroup );
                     res.json( stardevcgroup );
                 }, (err) => next( err ) )
                 .catch( ( err ) => next( err ) );

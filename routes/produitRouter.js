@@ -4,6 +4,9 @@ const Produit = require('./../models/produit');
 var authenticate = require( './../authenticate' );
 var mongoose = require('mongoose');
 const cors  = require('./cors');
+const url = require('url');
+const aqp = require( 'api-query-params' );
+
 
 var upload = require( './../customMulter' )
 
@@ -12,6 +15,7 @@ var upload = require( './../customMulter' )
 var produitRouter = express.Router();
 produitRouter.use( bodyParser.json() );
 
+const verifyField = ( field ) => ( field===undefined || field.length === 0) ? false : true;
 
 
 /* GET /produits */
@@ -22,22 +26,54 @@ produitRouter.route( '/' )
         res.setHeader('Content-Type', 'application/json');
         next();
     } )
-    .get( cors.corsWithOptions,  (req, res, next) => {
-        Produit.find( {} )
-        .populate(['user'])
-        .then( ( produit ) =>{
-            res.json( produit )
-            }, ( err ) => { next( err ) 
-        },  (err) => next(err))
-        .catch((err) => next(err));
+    .get( cors.corsWithOptions, async (req, res, next) => {
+        if (
+            req.url.indexOf('designation') > 0 || req.url.indexOf('description') > 0 ||
+            req.url.indexOf('prix') > 0 || req.url.indexOf('nature') > 0 ||
+            req.url.indexOf('quantite') > 0
+        ) {  
+            await Produit.find({
+                $or: [
+                    { designation: { $regex: '.*' +  req.query['designation'] + '.*',  $options: 'i' } },
+                    { description:  { $regex: '.*' +  req.query['description']  + '.*', $options: 'i' } },
+                    { nature:  { $regex: '.*' + req.query['nature']  + '.*', $options: 'i' } },
+                    { prix:  req.query['prix']===Number.NaN? 0:req.query['prix']  }     
+                ]
+                })
+               .populate(['user'])
+               .then( produits => {
+                    Produit.find({})
+                            .then(p => {
+                                if(produits.length != p.length) {
+                                    res.json(produits);
+                                } else {
+                                    res.statusCode = 404;
+                                    res.json({statusCode: res.statusCode, statusText: 'Produit non trouvé'})
+                                }
+                            })
+               }, err => next(err) );
+        } else {
+            Produit.find( {} )
+            .populate(['user'])
+            .then( ( produits ) =>{
+                produits.forEach( produit => {
+                    if( produit.quantite == 0 ) {
+                        Produit.findOneAndDelete( {_id: produit} )
+                            .then( prod => {}  );
+                    }  
+                } ) 
+                res.json( produits )
+                }, ( err ) => { next( err ) 
+            },  (err) => next(err))
+            .catch((err) => next(err));
+        }
     })
     .post( cors.corsWithOptions, authenticate.verifyUser, upload.array('images', 12), ( req, res, next ) =>{
-        console.log( "*****", req.body )
         req.body.images = [];
         if( req.body.ville != undefined )
             req.body.ville = mongoose.Types.ObjectId( req.body.ville.trim() );
-        if( req.body.user != undefined )
-            req.body.user = mongoose.Types.ObjectId( req.body.user.trim() );
+        if( req.user._id != undefined )
+            req.body.user = req.user._id;
         if( req.files != undefined ) {
             req.files.forEach( file => {
                 req.body.images.push(file.path.substr( 'public'.length ));
@@ -46,7 +82,6 @@ produitRouter.route( '/' )
         if( req.body != undefined ) {
             Produit.create( req.body )
                 .then(( produit ) => {
-                    console.log( 'produit crée ', produit );
                     res.json( produit );
                 }, (err) => next( err ) )
                 .catch( ( err ) => next( err ) );
@@ -58,7 +93,7 @@ produitRouter.route( '/' )
     } )
     .put( cors.corsWithOptions,  authenticate.verifyUser, authenticate.verifyAdmin, ( req, res, next ) => {
         res.statusCode = 403;
-        res.json({'message': 'La methode PUT n\'est pas supporté', 'status': res.statusCode } )
+        res.json({'message': 'La methode PUT n\'est pas supporté', 'status': res.statusCode } ); 
     } )
     .delete( cors.corsWithOptions,  authenticate.verifyUser, ( req, res, next ) => {
         Produit.remove({})
@@ -77,6 +112,7 @@ produitRouter.route( '/:id' )
         next();
     } )
     .get( cors.cors, (req, res, next) => {
+        const queryObject = url.parse(req.url,true).query;
         Produit.findById( req.params.id )
             .populate([ 'user'])
             .then( ( produit ) => {
@@ -88,6 +124,7 @@ produitRouter.route( '/:id' )
                 res.json({'message': err.message, 'status': err.status });
             } );
     })
+    
     .post( cors.corsWithOptions, authenticate.verifyUser, ( req, res, next ) =>{
         res.statusCode = 403;
         res.json({'message': 'La methode POST n\'est pas supporté.', 'status': res.statusCode } )
@@ -133,7 +170,6 @@ produitRouter.route( '/:id' )
         Produit.findById( req.params.id )
         .then( ( produit ) => {
             if( produit.user.toString() === req.user._id.toString() ) {
-                console.log( produit.user +'=='+ req.user._id)
                 Produit.findByIdAndRemove(req.params.id)
                     .then( ( resp ) => {
                         res.json(resp);

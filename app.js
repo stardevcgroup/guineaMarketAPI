@@ -21,6 +21,10 @@ const reseauRouter = require('./routes/reseauRouter');
 const villeRouter = require('./routes/villeRouter');
 const produitRouter = require('./routes/produitRouter');
 const uploadRouter = require( './routes/uploadRouter' );
+const actualiteRouter = require( './routes/actualiteRouter' );
+const panierRouter = require( './routes/panierRouter' );
+const commandeRouter = require( './routes/commandeRouter' );
+const stardevcgroupRouter = require('./routes/stardevcgroupRoutter');
 
 const connect = mongoose.connect(url);
 
@@ -83,6 +87,10 @@ app.use( '/reseaux', reseauRouter );
 app.use( '/villes', villeRouter );
 app.use( '/produits', produitRouter );
 app.use( '/uploadImage', uploadRouter );
+app.use( '/actualites', actualiteRouter );
+app.use( '/paniers', panierRouter );
+app.use( '/commandes', commandeRouter );
+app.use( '/stardevcgroups', stardevcgroupRouter )
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

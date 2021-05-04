@@ -1,6 +1,8 @@
 var express = require( 'express' );
 var bodyParser = require( 'body-parser' );
 const Categorie = require('./../models/categorie');
+const cors = require( './cors' );
+const Produit = require('../models/produit');
 
 var categorieRouter = express.Router();
 categorieRouter.use( bodyParser.json() );
@@ -15,20 +17,43 @@ categorieRouter.route( '/' )
         res.setHeader('Content-Type', 'application/json');
         next();
     } )
-    .get( (req, res, next) => {
-        Categorie.find( {} )
-        .then( ( categorie ) =>{
-            res.json( categorie )
-            }, ( err ) => { next( err ) 
-        },  (err) => next(err))
-        .catch((err) => next(err));
+    .get( cors.corsWithOptions, async (req, res, next) => {
+        if ( req.url.indexOf('libele') > 0 ) {  
+            await Categorie.find( { libele:  { $regex: '.*' + req.query['libele'] + '.*', $options: 'i' } } )
+               .populate(['user'])
+               .then( categories => {
+                    Categorie.find({})
+                            .then(c => {
+                                if(categories.length != c.length) {
+                                    categories.forEach( c => {
+                                        Produit.find( )
+                                               .then( p => {
+                                                    p.forEach( pp => {
+                                                        if ( pp.categorie.toString() === c._id.toString() ) {
+                                                            res.json(pp);
+                                                        }
+                                                    } )
+                                               } )                                             
+                                    } )
+                                } else {
+                                    res.statusCode = 404;
+                                    res.json({statusCode: res.statusCode, statusText: 'Categorie non trouvée'})
+                                }
+                            })
+               }, err => next(err) );
+        } else {
+            Categorie.find( {} )
+            .then( ( categories ) =>{
+                res.json( categories )
+                }, ( err ) => { next( err ) 
+            },  (err) => next(err))
+            .catch((err) => next(err));
+        }
     })
     .post( ( req, res, next ) =>{
         if( req.body.libele != undefined ) {
-            
             Categorie.create( req.body )
                 .then(( categorie ) => {
-                    console.log( 'categorie crée ', categorie );
                     res.json( categorie );
                 }, (err) => {
                     err = new Error('Catégroie  non trouvé'); 

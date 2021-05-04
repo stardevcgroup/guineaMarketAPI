@@ -27,7 +27,6 @@ utilisateurRouter.route( '/' )
         if( req.body.nom != undefined ) {
             Utilisateur.create( req.body )
             .then(( utilisateur ) => {
-                console.log( 'Utilisatteur crée ', utilisateur );
                 res.json( utilisateur );
             }, (err) => next( err ) )
             .catch( ( err ) => next( err ) );  

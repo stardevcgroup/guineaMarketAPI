@@ -27,7 +27,6 @@ reseauRouter.route( '/' )
         if( req.body.url != undefined ) {
             Reseau.create( req.body )
             .then(( reseau ) => {
-                console.log( 'reseau crée ', reseau );
                 res.json( reseau );
             }, (err) => next( err ) )
             .catch( ( err ) => next( err ) );  

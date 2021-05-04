@@ -6,7 +6,6 @@ var storage = mutlter.diskStorage( {
 
   destination: ( req, file, cb ) => {
       var username = jwt_decode(req.headers.authorization);
-      console.log( username )
       username = JSON.stringify( username.username );
       username = username.replace(' ', '');
       username = username.replace('"', '');

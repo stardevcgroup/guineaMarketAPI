@@ -13,9 +13,7 @@ var fs = require( 'fs' );
 var storage = mutlter.diskStorage( {
 
   destination: ( req, file, cb ) => {
-      var username = req.body.username;;
-      username = ( username.indexOf('@') > 0 ) ? username.substr(0, (username.indexOf('@') ) ): username;
-      let dir = 'public/images/users/' + username;
+      let dir = extraireUsenamewithArrobase( req.headers.authorization, 'users' );
       if (!fs.existsSync(dir)){
         fs.mkdirSync(dir);
       }
@@ -40,6 +38,15 @@ router.use( bodyParser.json() )
 
 router.get( '/',  (req, res, next) => {
   User.find( {} )
+  .then( ( utilisateur ) =>{
+      res.json( utilisateur )
+      }, ( err ) => { next( err ) 
+  },  (err) => { res.json( { statusText: err.message, statusCode: err.status } ) })
+  .catch((err) => next( err ) );//{ res.json( { statusText: err.message, statusCode: err.status } ) });
+});
+/* GET user by id. */
+router.get( '/:id',  (req, res, next) => {
+  User.findById( {_id: req.params.id} )
   .then( ( utilisateur ) =>{
       res.json( utilisateur )
       }, ( err ) => { next( err ) 
@@ -113,7 +120,6 @@ router.post('/signup',  cors.corsWithOptions, upload.single( 'avatar'), (req, re
 });
 
 router.post( '/login', passport.authenticate('local') , ( req, res ) => {
-  console.log( req.body )
   res.setHeader( 'Content-Type', 'application/json' );
   if ( req.body.password === undefined || req.body.password == null) {
     let err = new Error( 'username et le mot de passe sont réquis' );
@@ -139,7 +145,6 @@ router.put("/reset-password/:id", function(req, res) {
   var userid = req.params.id;
   var username = req.body.username;
   var newPass = req.body.password;
-  console.log(username, userid)
   User.findByUsername(username).then(function(sanitizedUser) {
       if (sanitizedUser) {
           sanitizedUser.setPassword(newPass, function() {
@@ -149,8 +154,8 @@ router.put("/reset-password/:id", function(req, res) {
       } else {
           res.send('L\'utilisateur n\'existe pas');
       }
-  }, function(err) {
-      console.error(err);
+  }, ( err ) => {
+     next(err)
   })
 })
 

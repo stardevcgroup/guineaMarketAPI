@@ -9,7 +9,6 @@ const whitelist = [
     'http://152.228.217.119:27017'];
 var corsOptionsDelegate = (req, callback) => {
     var corsOptions;
-    console.log(req.header('Origin'));
     if(whitelist.indexOf(req.header('Origin')) !== -1) {
         corsOptions = { origin: true };
     }
