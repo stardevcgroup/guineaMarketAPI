@@ -42,16 +42,11 @@ produitRouter.route( '/' )
                 })
                .populate(['user'])
                .then( produits => {
-                    Produit.find({})
-                            .then(p => {
-                                if(produits.length != p.length) {
-                                    res.json(produits);
-                                } else {
-                                    res.statusCode = 404;
-                                    res.json({statusCode: res.statusCode, statusText: 'Produit non trouvé'})
-                                }
-                            })
-               }, err => next(err) );
+                                res.json( produits );
+                        }, err => {
+                                res.statusCode = 404;
+                                res.json({statusCode: res.statusCode, statusText: 'Produit non trouvé'})
+                        } );
         } else {
             Produit.find( {} )
             .populate(['user'])

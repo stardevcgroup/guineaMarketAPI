@@ -80,13 +80,26 @@ router.get( '/facebook/token', passport.authenticate('facebook-token'), ( req, r
 
 
 router.post('/signup',  cors.corsWithOptions, upload.single( 'avatar'), (req, res, next) => {
+  var avatar = '/images/users/avatar.png';
+  if( req.file ) {
+    user.avatar = req.file.path.substr( "public".length );
+  }
    
-  User.register(new User({username: req.body.username}), 
+  User.register(new User(
+                      {
+                        username: req.body.username,
+                        firstname: req.body.firstname,
+                        lastname: req.body.lastname,
+                        emails: req.body.emails,
+                        phones: req.body.phones,
+                        avatar: avatar,
+                        cin: req.body.cin
+                      }), 
     req.body.password, (err, user) => {
     if(err) {
-      res.statusCode = 500;
+      res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.json({err: err});
+      res.json({success: true, status: 'Inscription réussi!'});
     }
     else {
       if (req.body.firstname)
@@ -99,10 +112,8 @@ router.post('/signup',  cors.corsWithOptions, upload.single( 'avatar'), (req, re
         user.phone = req.body.phone;
       if (req.body.cin)
         user.cin = req.body.cin;
-      if( user.avatar ) {
-        user.avatar = req.file.path.substr( "public".length );
-      }
-      user.save((err, user) => {
+      
+      User.save((err, user) => {
         if (err) {
           res.statusCode = 500;
           res.setHeader('Content-Type', 'application/json');

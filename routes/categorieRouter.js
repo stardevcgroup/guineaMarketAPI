@@ -23,8 +23,7 @@ categorieRouter.route( '/' )
                .populate(['user'])
                .then( categories => {
                     Categorie.find({})
-                            .then(c => {
-                                if(categories.length != c.length) {
+                            .then(c => {                              
                                     categories.forEach( c => {
                                         Produit.find( )
                                                .then( p => {
@@ -35,10 +34,9 @@ categorieRouter.route( '/' )
                                                     } )
                                                } )                                             
                                     } )
-                                } else {
-                                    res.statusCode = 404;
-                                    res.json({statusCode: res.statusCode, statusText: 'Categorie non trouvée'})
-                                }
+                            }, (err) => {
+                                res.statusCode = 404;
+                                res.json({statusCode: res.statusCode, statusText: 'Categorie non trouvée'})
                             })
                }, err => next(err) );
         } else {

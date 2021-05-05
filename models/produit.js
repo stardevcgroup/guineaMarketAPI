@@ -45,7 +45,7 @@ const produitShema = new Schema( {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Categorie'
     },
-    natutre: {
+    nature: {
         type: String,
         require: true,
         default: 'Occasion'
