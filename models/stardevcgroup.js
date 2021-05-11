@@ -4,11 +4,19 @@ var Schema = mongoose.Schema;
 
 
 var stardevcgroupSshema = new Schema( {
-    login: {
+    logos: [{
         type: String,
         require: true,
         default: '/images/login/logo.png'
-    },
+    }],
+    images: [
+        { type: String }
+    ],
+    slogans: [
+       {
+           type: String
+       } 
+    ],
     nom: {
         type: String,
         require: true
@@ -21,12 +29,21 @@ var stardevcgroupSshema = new Schema( {
         type: String,
         require: true
     },
-    technologies: {
-        type: String,
-        require: true
+    technologies: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Technologie'
+    }],
+    contact: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Contact'
+
     },
-    emails: [],
-    phones: [],
+    services: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Service'
+        }
+    ],
 } );
 
 

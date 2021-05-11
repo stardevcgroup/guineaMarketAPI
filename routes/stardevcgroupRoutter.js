@@ -5,6 +5,10 @@ var authenticate = require( './../authenticate' );
 var mongoose = require('mongoose');
 var upload = require( './../customMulter' );
 const cors  = require('./cors');
+const contactRouter = require('./contactRouter');
+const Contact = require('../models/contact');
+const Service = require('../models/service');
+const Reseau = require('../models/reseau');
 
 
 var upload = upload;
@@ -24,14 +28,15 @@ stardevcgroupRouter.route( '/' )
     } )
     .get( cors.cors,  (req, res, next) => {
         Stardevcgroup.find( {} )
-        .then( ( stardevcgroup ) =>{
-            res.json( stardevcgroup )
-            }, ( err ) => { next( err ) 
-        },  (err) => next(err))
-        .catch((err) => next(err));
+                     .populate([{ path: 'contact', model: Contact,
+                                    populate: {
+                                        path: 'reseaux',
+                                        model: Reseau
+                            }}, 'technologies', 'services'])
+                                .exec((erreur, universite) => {res.send( universite )})
     })
-    .post( cors.corsWithOptions, authenticate.verifyAdmin, ( req, res, next ) =>{ 
-        if( req.body.designation != undefined ) {
+    .post( cors.corsWithOptions, ( req, res, next ) =>{ 
+        if( req.body != undefined ) {
             Stardevcgroup.create( req.body )
                 .then(( stardevcgroup ) => {
                     res.json( stardevcgroup );
@@ -47,8 +52,8 @@ stardevcgroupRouter.route( '/' )
         res.statusCode = 403;
         res.json({'message': 'La methode PUT n\'est pas supporté', 'status': res.statusCode } )
     } )
-    .delete( cors.corsWithOptions,  authenticate.verifyAdmin, ( req, res, next ) => {
-        Produit.remove({})
+    .delete( cors.corsWithOptions,  ( req, res, next ) => {
+        Stardevcgroup.remove({})
         .then( ( resp ) => {
             res.json(resp);
         }, (err) => next(err))

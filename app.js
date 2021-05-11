@@ -25,6 +25,10 @@ const actualiteRouter = require( './routes/actualiteRouter' );
 const panierRouter = require( './routes/panierRouter' );
 const commandeRouter = require( './routes/commandeRouter' );
 const stardevcgroupRouter = require('./routes/stardevcgroupRoutter');
+const contactRouter = require( './routes/contactRouter' );
+const serviceRouter = require( './routes/serviceRouter' );
+const principeRouter = require( './routes/principeRouter' );
+const technologieRouter = require( './routes/technologieRouter' );
 
 const connect = mongoose.connect(url);
 
@@ -90,7 +94,11 @@ app.use( '/uploadImage', uploadRouter );
 app.use( '/actualites', actualiteRouter );
 app.use( '/paniers', panierRouter );
 app.use( '/commandes', commandeRouter );
-app.use( '/stardevcgroups', stardevcgroupRouter )
+app.use( '/stardevcgroups', stardevcgroupRouter );
+app.use( '/contact', contactRouter );
+app.use( '/services', serviceRouter );
+app.use( '/principes', principeRouter );
+app.use( '/technologies', technologieRouter );
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
